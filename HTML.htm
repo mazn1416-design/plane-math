@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>إنقاذ الطائرة - ياسر مفرح العنزي 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; font-family: 'Cairo', sans-serif; background: #0ea5e9; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        .box { width: 95%; max-width: 500px; background: #fff; border-radius: 30px; border: 6px solid #ef4444; padding: 25px; text-align: center; position: relative; box-shadow: 0 15px 40px rgba(0,0,0,0.4); z-index: 100; overflow: hidden; }
+        
+        .rights-box { background: #f1f5f9; padding: 10px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #e2e8f0; }
+        .rights-text { color: #475569; font-size: 14px; font-weight: 700; margin: 0; }
+        
+        /* السماء والعناصر البصرية */
+        .sky { height: 250px; position: relative; overflow: hidden; border-radius: 20px; background: linear-gradient(#38bdf8, #87ceeb); border: 3px solid #0284c7; margin: 10px 0; }
+        .sun { position: absolute; width: 60px; height: 60px; background: radial-gradient(circle, #ffd700, #ff8c00); border-radius: 50%; top: 20px; right: 20px; box-shadow: 0 0 20px #ffd700; }
+        .cloud { position: absolute; background: #fff; border-radius: 50px; opacity: 0.8; animation: moveClouds 20s linear infinite; }
+        .c1 { width: 80px; height: 30px; top: 40px; left: -100px; }
+        .c2 { width: 100px; height: 40px; top: 120px; left: -150px; animation-delay: 5s; }
+        @keyframes moveClouds { from { left: -150px; } to { left: 110%; } }
+
+        .plane-container { position: absolute; right: 10%; top: 35%; width: 150px; transition: all 1s ease-in-out; z-index: 50; }
+        .shake-layer { animation: simpleShake 2s infinite ease-in-out; }
+        @keyframes simpleShake { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(3px); } }
+        #plane { width: 100%; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.3)); }
+        
+        .safe-landing { transform: translateY(160px) translateX(-380px) rotate(-3deg) scale(0.6) !important; transition: transform 6s ease-in-out !important; }
+
+        #captain-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(220, 38, 38, 0.95); color: #fff; padding: 20px; border-radius: 15px; z-index: 1000; font-weight: 900; width: 85%; border: 3px dashed #fff; display: none; }
+
+        .timer-bar { height: 10px; background: #e5e7eb; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        #progress { height: 100%; background: #ef4444; width: 100%; transition: 0.1s linear; }
+        
+        .q-card { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 15px; padding: 15px; font-weight: 800; min-height: 70px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .opt-btn { padding: 12px; border-radius: 12px; border: 2px solid #cbd5e1; font-family: 'Cairo'; font-weight: 700; cursor: pointer; background: #fff; font-size: 16px; transition: 0.3s; }
+        .opt-btn:disabled { cursor: default; opacity: 0.8; }
+        
+        .correct { background: #22c55e !important; color: white !important; border-color: #16a34a !important; }
+        .wrong { background: #ef4444 !important; color: white !important; border-color: #dc2626 !important; }
+        
+        .hidden { display: none !important; }
+        
+        .vol-control { margin: 15px 0; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: bold; color: #475569; }
+        input[type=range] { cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <div id="start-scr">
+        <div class="rights-box">
+            <p class="rights-text">جميع الحقوق محفوظة: ياسر مفرح العنزي 2026</p>
+        </div>
+        
+        <h1 style="color:#ef4444; margin:0; font-size: 35px; font-weight: 900;">أنقذ الطائرة</h1>
+        <p style="margin:5px 0; color:#334155; font-weight:800; font-size: 20px;">باستخدام الأرقام</p>
+        
+        <img src="https://i.ibb.co/ccvY49sb/image.png" style="width: 150px; margin: 10px 0;">
+
+        <div class="vol-control">
+            <span>🔈</span>
+            <input type="range" id="vol-slider" min="0" max="1" step="0.1" value="0.5" onchange="updateVol(this.value)">
+            <span>🔊</span>
+        </div>
+
+        <input id="pilot-name" type="text" placeholder="أدخل اسم المنقذ" style="width:80%; padding:12px; border-radius:10px; border:2px solid #ddd; text-align:center; font-family:'Cairo'; margin-bottom: 15px;">
+        <br>
+        <button onclick="startMission()" style="background:#ef4444; color:white; border:none; padding:15px 50px; border-radius:20px; font-size:20px; font-weight:900; cursor:pointer;">ابدأ المهمة 🚀</button>
+    </div>
+
+    <div id="game-scr" class="hidden">
+        <div class="sky">
+            <div class="sun"></div>
+            <div class="cloud c1"></div>
+            <div class="cloud c2"></div>
+            <div id="captain-msg"></div>
+            <div class="plane-container" id="p-cont">
+                <div class="shake-layer" id="shake-node">
+                    <img id="plane" src="https://i.ibb.co/ccvY49sb/image.png">
+                </div>
+            </div>
+        </div>
+        <div class="header" style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:10px;">
+            <div id="disp-name"></div>
+            <div>السؤال: <span id="q-idx">1</span>/10</div>
+            <div>الأعطال: <span id="dmg">0</span>/3</div>
+        </div>
+        <div class="timer-bar"><div id="progress"></div></div>
+        <div class="q-card" id="q-text"></div>
+        <div class="opts" id="opt-box"></div>
+    </div>
+
+    <div id="end-scr" class="hidden">
+        <h2 id="final-status"></h2>
+        <div id="score-res" style="font-size: 35px; font-weight: 900; color: #0284c7; margin: 15px 0;"></div>
+        <button onclick="location.reload()" style="background:#0284c7; color:white; border:none; padding:15px 50px; border-radius:12px; font-weight:900; cursor:pointer;">إعادة المحاولة 🔄</button>
+    </div>
+</div>
+
+<audio id="snd-correct" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
+<audio id="snd-alert" src="https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3"></audio>
+<audio id="snd-crash-final" src="https://mp4.shabakngy.com/m/m/Q7LB-rx1TPw.mp3"></audio>
+<audio id="snd-landing" src="https://mp4.shabakngy.com/m/m/El2mpazm0wo.mp3"></audio>
+
+<script>
+    let score = 0, qNum = 0, clock, damage = 0, locked = false;
+    let audios = ['snd-correct', 'snd-alert', 'snd-crash-final', 'snd-landing'];
+
+    function updateVol(val) {
+        audios.forEach(id => {
+            document.getElementById(id).volume = val;
+        });
+    }
+
+    let questionsData = [
+        {q: "مجموع زوايا المثلث؟", o: ["180°", "90°", "360°", "270°"], a: 0},
+        {q: "جذر العدد 64 هو:", o: ["6", "7", "8", "9"], a: 2},
+        {q: "الزاويتان المتتامتان مجموعهما؟", o: ["180°", "90°", "45°", "360°"], a: 1},
+        {q: "قيمة س في 2س=10 هي:", o: ["2", "5", "8", "20"], a: 1},
+        {q: "المنوال للقيم (1,2,2,3) هو:", o: ["1", "2", "3", "4"], a: 1},
+        {q: "الزاوية القائمة قياسها؟", o: ["90°", "180°", "45°", "360°"], a: 0},
+        {q: "مساحة مربع طول ضلعه 4سم؟", o: ["8سم", "12سم", "16سم", "20سم"], a: 2},
+        {q: "العدد الأولي هو:", o: ["4", "6", "7", "9"], a: 2},
+        {q: "نصف العدد 100 هو:", o: ["25", "50", "75", "10"], a: 1},
+        {q: "3 × 3 × 3 تساوي:", o: ["9", "18", "27", "81"], a: 2}
+    ];
+
+    let questions = questionsData.sort(() => Math.random() - 0.5);
+
+    function startMission() {
+        const name = document.getElementById('pilot-name').value;
+        if (!name) return alert("اكتب اسم المنقذ!");
+        document.getElementById('disp-name').innerText = "الطيار: " + name;
+        document.getElementById('start-scr').classList.add('hidden');
+        document.getElementById('game-scr').classList.remove('hidden');
+        updateVol(document.getElementById('vol-slider').value);
+        showMsg("استعد.. الطائرة في عهدتك الآن!", 2000, true);
+    }
+
+    function loadQ() {
+        if (damage >= 3) return;
+        if (qNum >= questions.length) { executeLanding(); return; }
+        document.getElementById('q-idx').innerText = qNum + 1;
+        let data = questions[qNum];
+        document.getElementById('q-text').innerText = data.q;
+        const box = document.getElementById('opt-box');
+        box.innerHTML = "";
+        let options = data.o.map((opt, idx) => ({text: opt, isCorrect: idx === data.a}));
+        options.sort(() => Math.random() - 0.5);
+        options.forEach((opt) => {
+            let btn = document.createElement('button');
+            btn.className = "opt-btn";
+            btn.innerText = opt.text;
+            btn.onclick = () => check(opt.isCorrect, btn);
+            box.appendChild(btn);
+        });
+        startClock();
+    }
+
+    function startClock() {
+        clearInterval(clock);
+        let time = 10;
+        const bar = document.getElementById('progress');
+        clock = setInterval(() => {
+            if (!locked) {
+                time -= 0.1;
+                bar.style.width = (time / 10 * 100) + "%";
+                if (time <= 0) { clearInterval(clock); check(false, null); }
+            }
+        }, 100);
+    }
+
+    function check(isRight, btn) {
+        if (locked) return;
+        locked = true;
+        clearInterval(clock);
+        if (isRight) {
+            score++;
+            if (btn) btn.classList.add('correct');
+            document.getElementById('snd-correct').play();
+            setTimeout(() => { qNum++; loadQ(); locked = false; }, 800);
+        } else {
+            damage++;
+            if (btn) btn.classList.add('wrong');
+            document.getElementById('snd-alert').play();
+            handleDmg();
+        }
+        document.getElementById('dmg').innerText = damage;
+    }
+
+    function handleDmg() {
+        if (damage === 1) showMsg("⚠️ إنذار: خلل في التوازن!", 2000, true);
+        else if (damage === 2) showMsg("🔥 خطر: المحرك يشتعل!", 2000, true);
+        else if (damage === 3) executeCrash();
+        if(damage < 3) qNum++;
+    }
+
+    function executeLanding() {
+        locked = true; 
+        const container = document.getElementById('p-cont');
+        const landingAudio = document.getElementById('snd-landing');
+        document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+        container.classList.add('safe-landing');
+        landingAudio.play(); 
+        showMsg("🏆 كفو.. جاري الهبوط النهائي بسلام!", 6000, false);
+        landingAudio.onended = () => endMission(true);
+        setTimeout(() => { if(!document.getElementById('game-scr').classList.contains('hidden')) endMission(true); }, 8500);
+    }
+
+    function executeCrash() {
+        locked = true;
+        const audio = document.getElementById('snd-crash-final');
+        const container = document.getElementById('p-cont');
+        audio.play();
+        container.style.transform = "translateY(500px) rotate(120deg)";
+        container.style.transition = "4s";
+        showMsg("🆘 نداء استغاثة.. سقوط حر!", 4000, false);
+        audio.onended = () => endMission(false);
+    }
+
+    function showMsg(text, time, next) {
+        locked = true;
+        const msgBox = document.getElementById('captain-msg');
+        msgBox.innerText = text;
+        msgBox.style.display = 'block';
+        setTimeout(() => { msgBox.style.display = 'none'; locked = false; if(next) loadQ(); }, time);
+    }
+
+    function endMission(success) {
+        document.getElementById('game-scr').classList.add('hidden');
+        document.getElementById('end-scr').classList.remove('hidden');
+        const status = document.getElementById('final-status');
+        status.innerText = success ? "🏆 كفو! تم هبوط الطائرة بسلام" : "❌ تحطمت الطائرة!";
+        status.style.color = success ? "green" : "red";
+        document.getElementById('score-res').innerText = "الدرجة: " + score;
+    }
+</script>
+</body>
+</html>
